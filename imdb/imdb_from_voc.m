@@ -31,25 +31,28 @@ cache_file = ['./imdb/cache/imdb_voc_' year '_' image_set];
 try
   load(cache_file);
 catch
-  VOCopts = get_voc_opts(root_dir);
-  VOCopts.testset = image_set;
+  dataset = ['VOC' year];
+  VOCopts.annopath=fullfile(root_dir, dataset, 'Annotations/%s.xml');
+  VOCopts.imgpath=fullfile(root_dir, dataset, 'JPEGImages/%s.jpg');
+  VOCopts.imgsetpath=fullfile(root_dir, dataset, 'ImageSets/Main/%s.txt');
 
   imdb.name = ['voc_' year '_' image_set];
   imdb.image_dir = fileparts(VOCopts.imgpath);
+  assert (exist(sprintf(VOCopts.imgsetpath, image_set)) == 2, sprintf(VOCopts.imgsetpath, image_set));
   imdb.image_ids = textread(sprintf(VOCopts.imgsetpath, image_set), '%s');
   imdb.extension = 'jpg';
-  imdb.classes = VOCopts.classes;
-  imdb.num_classes = length(imdb.classes);
-  imdb.class_to_id = ...
-    containers.Map(imdb.classes, 1:imdb.num_classes);
-  imdb.class_ids = 1:imdb.num_classes;
+  %imdb.classes = VOCopts.classes;
+  %imdb.num_classes = length(imdb.classes);
+  %imdb.class_to_id = ...
+  %  containers.Map(imdb.classes, 1:imdb.num_classes);
+  %imdb.class_ids = 1:imdb.num_classes;
 
   % private VOC details
-  imdb.details.VOCopts = VOCopts;
+  %imdb.details.VOCopts = VOCopts;
 
   % VOC specific functions for evaluation and region of interest DB
-  imdb.eval_func = @imdb_eval_voc;
-  imdb.roidb_func = @roidb_from_voc;
+  %imdb.eval_func = @imdb_eval_voc;
+  %imdb.roidb_func = @roidb_from_voc;
   imdb.image_at = @(i) ...
       sprintf('%s/%s.%s', imdb.image_dir, imdb.image_ids{i}, imdb.extension);
 
